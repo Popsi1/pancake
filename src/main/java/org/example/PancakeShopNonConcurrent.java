@@ -23,27 +23,20 @@ public class PancakeShopNonConcurrent {
             @Override
             public void run() {
                 int pancakesMade = new Random().nextInt(MAX_PANCAKES_SHOPKEEPER + 1);
-                System.out.println("pancakesMade" + " " + pancakesMade);
+
                 int[] pancakesOrdered = new int[NUM_USERS];
                 for (int i = 0; i < NUM_USERS; i++) {
                     pancakesOrdered[i] = new Random().nextInt(MAX_PANCAKES_USER + 1);
                 }
-
-        System.out.println("pancakesOrdered" + " " + Arrays.toString(pancakesOrdered));
 
                 int totalPancakesOrdered = 0;
                 for (int pancakes : pancakesOrdered) {
                     totalPancakesOrdered += pancakes;
                 }
 
-        System.out.println("totalPancakesOrdered" + " " + totalPancakesOrdered);
-
                 int pancakesEaten = Math.min(totalPancakesOrdered, totalPancakesMade);
-        System.out.println("pancakesEaten" + " " + pancakesEaten);
-        int ordersNotMet = totalPancakesOrdered - pancakesEaten;
-        System.out.println("ordersNotMet" + " " + ordersNotMet);
-        int pancakesWasted = totalPancakesMade - pancakesEaten;
-        System.out.println("pancakesWasted" + " " + pancakesWasted);
+                int ordersNotMet = totalPancakesOrdered - pancakesEaten;
+                int pancakesWasted = totalPancakesMade - pancakesEaten;
 
                 totalPancakesMade += pancakesMade;
                 totalPancakesEaten += pancakesEaten;
