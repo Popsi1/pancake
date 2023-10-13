@@ -1,8 +1,10 @@
 package org.example;
 
+import java.util.Arrays;
 import java.util.Random;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.CompletableFuture;
 
 public class PancakeShopConcurrent {
 
@@ -15,51 +17,47 @@ public class PancakeShopConcurrent {
     private static int totalOrdersNotMet = 0;
     private static int totalPancakesWasted = 0;
 
-    private static final Semaphore semaphore = new Semaphore(1);
-
     public static void main(String[] args) {
-        while (true) {
-            try {
-                semaphore.acquire();
+        Timer timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                CompletableFuture.runAsync(() -> {
+                    int pancakesMade = new Random().nextInt(MAX_PANCAKES_SHOPKEEPER + 1);
 
-                int pancakesMade = new Random().nextInt(MAX_PANCAKES_SHOPKEEPER + 1);
-                int[] pancakesOrdered = new int[NUM_USERS];
-                for (int i = 0; i < NUM_USERS; i++) {
-                    pancakesOrdered[i] = new Random().nextInt(MAX_PANCAKES_USER + 1);
-                }
+                    int[] pancakesOrdered = new int[NUM_USERS];
+                    for (int i = 0; i < NUM_USERS; i++) {
+                        pancakesOrdered[i] = new Random().nextInt(MAX_PANCAKES_USER + 1);
+                    }
 
-                int totalPancakesOrdered = 0;
-                for (int pancakes : pancakesOrdered) {
-                    totalPancakesOrdered += pancakes;
-                }
+                    int totalPancakesOrdered = 0;
+                    for (int pancakes : pancakesOrdered) {
+                        totalPancakesOrdered += pancakes;
+                    }
 
-                int pancakesEaten = Math.min(totalPancakesOrdered, totalPancakesMade);
-                int ordersNotMet = totalPancakesOrdered - pancakesEaten;
-                int pancakesWasted = totalPancakesMade - pancakesEaten;
+                    int pancakesEaten = Math.min(totalPancakesOrdered, totalPancakesMade);
+                    int ordersNotMet = totalPancakesOrdered - pancakesEaten;
+                    int pancakesWasted = totalPancakesMade - pancakesEaten;
 
-                totalPancakesMade += pancakesMade;
-                totalPancakesEaten += pancakesEaten;
-                totalOrdersNotMet += ordersNotMet;
-                totalPancakesWasted += pancakesWasted;
+                    totalPancakesMade += pancakesMade;
+                    totalPancakesEaten += pancakesEaten;
+                    totalOrdersNotMet += ordersNotMet;
+                    totalPancakesWasted += pancakesWasted;
 
-                System.out.println("Starting time: " + System.currentTimeMillis());
-                System.out.println("Ending time: " + (System.currentTimeMillis() + 30000));
-                System.out.println("Number of pancakes made by the shopkeeper: " + pancakesMade);
-                System.out.println("Number of pancakes eaten by users: " + pancakesEaten);
-                System.out.println("Orders not met: " + ordersNotMet);
-                System.out.println("Pancakes wasted: " + pancakesWasted);
-                System.out.println("Total pancakes made: " + totalPancakesMade);
-                System.out.println("Total pancakes eaten: " + totalPancakesEaten);
-                System.out.println("Total orders not met: " + totalOrdersNotMet);
-                System.out.println("Total pancakes wasted: " + totalPancakesWasted);
-
-                semaphore.release();
-
-                TimeUnit.SECONDS.sleep(30);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                    System.out.println("Starting time: " + System.currentTimeMillis());
+                    System.out.println("Ending time: " + (System.currentTimeMillis() + 30000));
+                    System.out.println("Number of pancakes made by the shopkeeper: " + pancakesMade);
+                    System.out.println("Number of pancakes eaten by users: " + pancakesEaten);
+                    System.out.println("Orders not met: " + ordersNotMet);
+                    System.out.println("Pancakes wasted: " + pancakesWasted);
+                    System.out.println("Total pancakes made: " + totalPancakesMade);
+                    System.out.println("Total pancakes eaten: " + totalPancakesEaten);
+                    System.out.println("Total orders not met: " + totalOrdersNotMet);
+                    System.out.println("Total pancakes wasted: " + totalPancakesWasted);
+                });
             }
-        }
+        };
+
+        timer.schedule(task, 0, 30000);
     }
 }
-
